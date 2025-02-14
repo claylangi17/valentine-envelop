@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Pink Envelope + Secret Message</title>
+    <!-- Pastikan viewport agar responsif di HP -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Font untuk judul dan pesan -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-env: #FFB7C5;
+            --color-env2: #ff9aad;
+            --color-flap: #ff8da1;
+            --color-bg: #ed7fca;
+            --color-heart: #ff85a2;
+            --color-sparkle: #fff;
+            --wax-red: #c04040;
+
+            --color-popup: #fdf1f5;  /* Warna latar popup */
+            --color-border: #ffd1dc; /* Warna border popup */
+        }
+
+        body {
+            background: linear-gradient(135deg, #ff9aad, #ed7fca);
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow-x: hidden; /* Masih bisa scroll vertikal, tapi tidak horizontal */
+            font-family: Arial, sans-serif;
+        }
+
+        .title {
+            text-align: center;
+            margin-top: 20px;
+            font-family: 'Dancing Script', cursive;
+            font-size: 3em;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            z-index: 20;
+            animation: titleFadeIn 2s ease-out;
+        }
+        @keyframes titleFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .envlope-wrapper {
+            height: 400px; 
+            margin-top: 20px;
+            animation: float 3s ease-in-out infinite;
+            position: relative;
+            z-index: 10;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50%      { transform: translateY(-10px); }
+        }
+
+        /* Amplop pink */
+        #envelope {
+            position: relative;
+            width: 350px; /* Lebar default di desktop */
+            max-width: 90vw; /* Responsif di layar kecil */
+            height: 220px; 
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+            margin: 0 auto;
+            top: 80px; 
+            background-color: var(--color-flap);
+            box-shadow: 0 4px 20px rgba(0,0,0,.1);
+            cursor: pointer;
+        }
+
+        .front {
+            position: absolute;
+            width: 0;
+            height: 0;
+            z-index: 3;
+        }
+        .flap {
+            border-left: 175px solid transparent;
+            border-right: 175px solid transparent;
+            border-bottom: 100px solid transparent;
+            border-top: 120px solid var(--color-flap);
+            transform-origin: top;
+            pointer-events: none;
+        }
+        .pocket {
+            border-left: 175px solid var(--color-env);
+            border-right: 175px solid var(--color-env);
+            border-bottom: 110px solid var(--color-env2);
+            border-top: 110px solid transparent;
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
+        }
+
+        .letter {
+            position: relative;
+            background-color: #e0d9dd;
+            width: 90%;
+            margin: 0 auto;
+            height: 90%;
+            top: 5%;
+            border-radius: 6px;
+            box-shadow: 0 2px 26px rgba(0,0,0,.08);
+            padding: 15px;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        #envelope.open .letter {
+            overflow: visible;
+        }
+        .letter:after {
+            content: '';
+            position: absolute;
+            top: 0; bottom: 0; left: 0; right: 0;
+            background-image: linear-gradient(180deg, 
+                rgba(255,255,255,0.00) 25%, 
+                rgba(255,231,236,0.70) 55%, 
+                rgba(255,231,236,1.00) 100%);
+        }
+
+        .letter-corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #ffd1dc;
+            border-radius: 5px;
+            z-index: 3;
+        }
+        .corner-tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
+        .corner-br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
+
+        .message {
+            position: relative;
+            z-index: 2;
+            font-family: 'Dancing Script', cursive;
+            color: #d46a84;
+            text-align: center;
+            line-height: 1.4;
+            padding-top: 10px;
+            opacity: 0;
+        }
+        .open .message {
+            animation: fadeIn 1.5s ease forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        .message p {
+            margin: 10px 0;
+            font-size: 1.8em;
+            text-shadow: 0 2px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Buka-tutup animasi amplop */
+        .open .flap {
+            transform: rotateX(180deg);
+            transition: transform 0.4s ease, z-index 0.6s;
+            z-index: 1;
+        }
+        .close .flap {
+            transform: rotateX(0deg);
+            transition: transform 0.4s 0.6s ease, z-index 1s;
+            z-index: 5;
+        }
+        .close .letter {
+            transform: translateY(0px); 
+            transition: transform 0.4s ease, z-index 1s;
+            z-index: 1;
+        }
+        .open .letter {
+            transform: translateY(-60px) rotate(-2deg);
+            transition: transform 0.4s 0.6s ease, z-index 0.6s;
+            z-index: 2;
+        }
+
+        /* Hati dan sparkles */
+        .hearts, .sparkles {
+            position: absolute;
+            top: 90px;
+            left: 0; right: 0;
+            z-index: 2;
+        }
+        .heart, .sparkle {
+            position: absolute;
+            bottom: 0;
+            pointer-events: none;
+        }
+        .heart:before,
+        .heart:after {
+            content: "";
+            position: absolute;
+            left: 25px;
+            top: 0;
+            width: 25px;
+            height: 40px;
+            background: var(--color-heart);
+            border-radius: 25px 25px 0 0;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+        .heart:after {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+        }
+        .sparkle {
+            width: 8px;
+            height: 8px;
+            background: var(--color-sparkle);
+            border-radius: 50%;
+            animation: sparkleTwinkle 1s infinite;
+        }
+        .close .heart,
+        .close .sparkle {
+            opacity: 0;
+            animation: none;
+        }
+        .a1 { left: 20%; transform: scale(0.6); animation: slideUp 4s linear infinite, sideSway 2s ease-in-out infinite alternate; }
+        .a2 { left: 55%; animation: slideUp 5s linear infinite, sideSway 4s ease-in-out infinite alternate; }
+        .a3 { left: 10%; transform: scale(0.8); animation: slideUp 7s linear infinite, sideSway 2s ease-in-out infinite alternate; }
+        .s1 { left: 30%; animation: sparkleUp 3s linear infinite; }
+        .s2 { left: 60%; animation: sparkleUp 4s linear infinite; }
+        .s3 { left: 45%; animation: sparkleUp 5s linear infinite; }
+
+        @keyframes slideUp {
+            0%   { top: 0; }
+            100% { top: -600px; }
+        }
+        @keyframes sideSway {
+            0%   { margin-left: 0; }
+            50%  { margin-left: 50px; }
+            100% { margin-left: 0; }
+        }
+        @keyframes sparkleUp {
+            0%   { transform: translateY(0); opacity: 1; }
+            100% { transform: translateY(-500px) rotate(360deg); opacity: 0; }
+        }
+        @keyframes sparkleTwinkle {
+            0%, 100% { transform: scale(1); }
+            50%      { transform: scale(1.5); }
+        }
+
+        /* Tombol Secret Message */
+        .secret-btn {
+            margin-top: 40px;
+            background-color: var(--color-env2);
+            border: 2px solid var(--color-env);
+            color: #fff;
+            border-radius: 30px;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+            font-weight: 600;
+            z-index: 20;
+        }
+        .secret-btn:hover {
+            background-color: var(--color-env);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 7px 25px rgba(0,0,0,0.2);
+        }
+
+        /* POPUP WRAPPER (untuk Secret Message) */
+        .popup-wrapper {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.3);
+            display: none; /* Tersembunyi default */
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+        /* BENTUK KERTAS SURAT (POPUP) */
+        .popup-letter {
+            position: relative;
+            background: var(--color-popup);
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            padding: 30px 20px 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            text-align: center;
+            font-family: 'Dancing Script', cursive;
+            max-height: 70vh; /* Jika teks panjang, akan scroll */
+            overflow-y: auto;
+        }
+        /* Flap segitiga di atas popup */
+        .popup-letter::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -100%);
+            width: 0; height: 0;
+            border-left: 60px solid transparent;
+            border-right: 60px solid transparent;
+            border-bottom: 50px solid var(--color-popup);
+        }
+
+        /* Tombol close di dalam popup */
+        .close-btn {
+            display: inline-block;
+            background: var(--color-env2);
+            color: #fff;
+            border: 2px solid var(--color-env);
+            border-radius: 20px;
+            padding: 10px 20px;
+            font-size: 1em;
+            cursor: pointer;
+            margin-top: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        .close-btn:hover {
+            background-color: var(--color-env);
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Falling petals animation */
+        .petal-container {
+            pointer-events: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 5;
+            overflow: hidden;
+        }
+        .petal {
+            position: absolute;
+            top: -50px;
+            width: 15px;
+            height: 15px;
+            background: rgba(255,182,193,0.8);
+            opacity: 0.8;
+            border-radius: 50%;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            0%   { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0.2; }
+        }
+        .petal:nth-child(1) {
+            left: 10%; animation-duration: 8s;  animation-delay: 0s;
+        }
+        .petal:nth-child(2) {
+            left: 20%; animation-duration: 10s; animation-delay: 1s;
+        }
+        .petal:nth-child(3) {
+            left: 30%; animation-duration: 9s;  animation-delay: 0.5s;
+        }
+        .petal:nth-child(4) {
+            left: 40%; animation-duration: 11s; animation-delay: 1.5s;
+        }
+        .petal:nth-child(5) {
+            left: 50%; animation-duration: 7s;  animation-delay: 0.8s;
+        }
+        .petal:nth-child(6) {
+            left: 60%; animation-duration: 10s; animation-delay: 0.3s;
+        }
+        .petal:nth-child(7) {
+            left: 70%; animation-duration: 9s;  animation-delay: 1.2s;
+        }
+        .petal:nth-child(8) {
+            left: 80%; animation-duration: 8s;  animation-delay: 0.6s;
+        }
+        .petal:nth-child(9) {
+            left: 90%; animation-duration: 12s; animation-delay: 1.8s;
+        }
+        .petal:nth-child(10) {
+            left: 95%; animation-duration: 10s; animation-delay: 0.4s;
+        }
+
+        /* MEDIA QUERY UNTUK LAYAR KECIL */
+        @media (max-width: 480px) {
+            .title {
+                font-size: 2em; 
+            }
+            .envlope-wrapper {
+                height: auto; 
+                margin-top: 10px;
+            }
+            #envelope {
+                top: 0px;
+                margin-top: 20px; 
+                width: 90vw;
+                max-width: 350px; 
+                height: auto; 
+            }
+            .flap,
+            .pocket {
+                border-left: 45% solid transparent;  
+                border-right: 45% solid transparent;
+            }
+            .flap {
+                border-top: 25vw solid var(--color-flap);
+                border-bottom: 0 solid transparent; 
+            }
+            .pocket {
+                border-bottom: 25vw solid var(--color-env2);
+                border-top: 25vw solid transparent;
+            }
+            .letter {
+                top: 0%;
+                width: 90%;
+                height: auto;
+                margin-bottom: 20px;
+            }
+            .open .letter {
+                transform: translateY(-30px) rotate(-2deg);
+            }
+            .message p {
+                font-size: 1.4em; 
+            }
+            .secret-btn {
+                margin-top: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="title">Happy Valentine's Day!</div>
+
+    <!-- Amplop -->
+    <div class="envlope-wrapper">
+        <div id="envelope" class="close">
+            <div class="wax-seal"></div>
+            <div class="front flap"></div>
+            <div class="front pocket"></div>
+            <div class="letter">
+                <div class="letter-corner corner-tl"></div>
+                <div class="letter-corner corner-br"></div>
+                <div class="message">
+                    <p>Elisabeth Fabiola Wangkay 💖</p>
+                </div>
+            </div>
+            <div class="hearts">
+                <div class="heart a1"></div>
+                <div class="heart a2"></div>
+                <div class="heart a3"></div>
+            </div>
+            <div class="sparkles">
+                <div class="sparkle s1"></div>
+                <div class="sparkle s2"></div>
+                <div class="sparkle s3"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOMBOL SECRET MESSAGE -->
+    <button class="secret-btn" id="secretBtn">Secret Message</button>
+
+    <!-- POPUP SECRET MESSAGE -->
+    <div class="popup-wrapper" id="popupWrapper">
+      <div class="popup-letter">
+        <h2>Pesan Rahasia</h2>
+        <p>Dear Elisabeth,</p>
+        <p>
+          Terima kasih telah membuat hari-hariku lebih berwarna.  
+          Kamu adalah sosok yang begitu spesial dan selalu ada  
+          di setiap langkahku. Semoga kebahagiaan ini abadi!
+        </p>
+        <p>With love,</p>
+        <p>(Tulis namamu di sini)</p>
+
+        <button class="close-btn" id="closeBtn">Tutup</button>
+      </div>
+    </div>
+
+    <!-- Audio latar romantis -->
+    <audio id="loveAudio" preload="auto">
+        <source src="https://cdn.pixabay.com/download/audio/2022/03/29/audio_423ef21a5e.mp3?filename=romantic-love-connection-116985.mp3" type="audio/mp3">
+    </audio>
+
+    <!-- Elemen kelopak mawar yang jatuh -->
+    <div class="petal-container">
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            const envelope = $('#envelope');
+            const secretBtn = $('#secretBtn');
+            const popupWrapper = $('#popupWrapper');
+            const closeBtn = $('#closeBtn');
+
+            // Amplop: Klik untuk toggle buka/tutup
+            envelope.on('click', toggleEnvelope);
+
+            function toggleEnvelope() {
+                if(envelope.hasClass("open")) {
+                    closeEnvelope();
+                } else {
+                    openEnvelope();
+                }
+            }
+
+            function openEnvelope() {
+                envelope.removeClass("close").addClass("open");
+                const audio = document.getElementById("loveAudio");
+                if(audio) {
+                    audio.play();
+                }
+            }
+
+            function closeEnvelope() {
+                envelope.removeClass("open").addClass("close");
+                const audio = document.getElementById("loveAudio");
+                if(audio) {
+                    audio.pause();
+                    audio.currentTime = 0;
+                }
+            }
+
+            // Tombol Secret Message: tampilkan popup
+            secretBtn.on('click', function() {
+                popupWrapper.css('display', 'flex');
+            });
+
+            // Tombol "Tutup" di popup: sembunyikan popup
+            closeBtn.on('click', function() {
+                popupWrapper.css('display', 'none');
+            });
+        });
+    </script>
+</body>
+</html>
