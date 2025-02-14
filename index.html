@@ -69,7 +69,7 @@
             border-bottom-left-radius: 6px;
             border-bottom-right-radius: 6px;
             margin: 0 auto;
-            top: 140px; /* <-- Diubah dari 80px menjadi 140px */
+            top: 140px; 
             background-color: var(--color-flap);
             box-shadow: 0 4px 20px rgba(0,0,0,.1);
             cursor: pointer;
@@ -398,19 +398,24 @@
                 max-width: 350px; 
                 height: auto; 
             }
+
+            /* Pastikan border-left + border-right = 90vw (total lebar amplop) */
             .flap,
             .pocket {
-                border-left: 45% solid transparent;  
-                border-right: 45% solid transparent;
+                border-left: 45vw solid transparent;  
+                border-right: 45vw solid transparent;
             }
+            /* Flap atas ~34% dari lebar (pakai 34vw) */
             .flap {
-                border-top: 25vw solid var(--color-flap);
-                border-bottom: 0 solid transparent; 
+                border-top: 34vw solid var(--color-flap);
+                border-bottom: 0;
             }
+            /* Pocket bawah ~31% dari lebar (pakai 31vw) */
             .pocket {
-                border-bottom: 25vw solid var(--color-env2);
-                border-top: 25vw solid transparent;
+                border-bottom: 31vw solid var(--color-env2);
+                border-top: 31vw solid transparent;
             }
+
             .letter {
                 top: 0%;
                 width: 90%;
@@ -464,17 +469,17 @@
     <!-- POPUP SECRET MESSAGE -->
     <div class="popup-wrapper" id="popupWrapper">
       <div class="popup-letter">
-        <h2>Pesan Rahasia</h2>
+        <h2>Secret Message</h2>
         <p>Dear Elisabeth,</p>
         <p>
-          Terima kasih telah membuat hari-hariku lebih berwarna.  
-          Kamu adalah sosok yang begitu spesial dan selalu ada  
-          di setiap langkahku. Semoga kebahagiaan ini abadi!
+            Thanks for adding color to my everyday life. 
+            Your presence makes every moment brighter.
+            I’m grateful for our connection and hope our joy lasts forever!
         </p>
         <p>With love,</p>
-        <p>(Tulis namamu di sini)</p>
+        <p>Clay</p>
 
-        <button class="close-btn" id="closeBtn">Tutup</button>
+        <button class="close-btn" id="closeBtn">Close</button>
       </div>
     </div>
 
@@ -538,7 +543,7 @@
                 popupWrapper.css('display', 'flex');
             });
 
-            // Tombol "Tutup" di popup: sembunyikan popup
+            // Tombol "Close" di popup: sembunyikan popup
             closeBtn.on('click', function() {
                 popupWrapper.css('display', 'none');
             });
