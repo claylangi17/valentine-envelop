@@ -5,8 +5,8 @@
     <title>Pink Envelope + Secret Message</title>
     <!-- Pastikan viewport agar responsif di HP -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Font untuk judul dan pesan -->
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&display=swap" rel="stylesheet">
+    <!-- Font untuk judul (Dancing Script) dan popup (Allura) -->
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script&family=Allura&display=swap" rel="stylesheet">
     <style>
         :root {
             --color-env: #FFB7C5;
@@ -15,7 +15,6 @@
             --color-bg: #ed7fca;
             --color-heart: #ff85a2;
             --color-sparkle: #fff;
-            --wax-red: #c04040;
 
             --color-popup: #fdf1f5;  /* Warna latar popup */
             --color-border: #ffd1dc; /* Warna border popup */
@@ -33,6 +32,7 @@
             font-family: Arial, sans-serif;
         }
 
+        /* Judul */
         .title {
             text-align: center;
             margin-top: 20px;
@@ -48,9 +48,11 @@
             to   { opacity: 1; transform: translateY(0); }
         }
 
+        /* Amplop wrapper: tambahkan margin-top besar di desktop */
         .envlope-wrapper {
+            width: 350px; 
             height: 400px; 
-            margin-top: 20px;
+            margin-top: 120px; /* Perbesar jarak dari judul */
             animation: float 3s ease-in-out infinite;
             position: relative;
             z-index: 10;
@@ -63,18 +65,15 @@
         /* Amplop pink */
         #envelope {
             position: relative;
-            width: 350px; /* Lebar default di desktop */
-            max-width: 90vw; /* Responsif di layar kecil */
+            width: 350px; 
             height: 220px; 
+            margin: 0 auto;
+            background-color: var(--color-flap);
             border-bottom-left-radius: 6px;
             border-bottom-right-radius: 6px;
-            margin: 0 auto;
-            top: 140px; 
-            background-color: var(--color-flap);
             box-shadow: 0 4px 20px rgba(0,0,0,.1);
             cursor: pointer;
         }
-
         .front {
             position: absolute;
             width: 0;
@@ -90,14 +89,15 @@
             pointer-events: none;
         }
         .pocket {
-            border-left: 175px solid var(--color-env);
-            border-right: 175px solid var(--color-env);
-            border-bottom: 110px solid var(--color-env2);
+            border-left: 175px solid #FFB7C5;
+            border-right: 175px solid #FFB7C5;
+            border-bottom: 110px solid #ff9aad;
             border-top: 110px solid transparent;
             border-bottom-left-radius: 6px;
             border-bottom-right-radius: 6px;
         }
 
+        /* Isi surat */
         .letter {
             position: relative;
             background-color: #e0d9dd;
@@ -123,7 +123,6 @@
                 rgba(255,231,236,0.70) 55%, 
                 rgba(255,231,236,1.00) 100%);
         }
-
         .letter-corner {
             position: absolute;
             width: 20px;
@@ -135,6 +134,7 @@
         .corner-tl { top: 10px; left: 10px; border-right: none; border-bottom: none; }
         .corner-br { bottom: 10px; right: 10px; border-left: none; border-top: none; }
 
+        /* Pesan dalam surat */
         .message {
             position: relative;
             z-index: 2;
@@ -158,7 +158,7 @@
             text-shadow: 0 2px 3px rgba(0,0,0,0.1);
         }
 
-        /* Buka-tutup animasi amplop */
+        /* Animasi buka/tutup amplop */
         .open .flap {
             transform: rotateX(180deg);
             transition: transform 0.4s ease, z-index 0.6s;
@@ -268,33 +268,37 @@
             box-shadow: 0 7px 25px rgba(0,0,0,0.2);
         }
 
-        /* POPUP WRAPPER (untuk Secret Message) */
+        /* Popup wrapper */
         .popup-wrapper {
             position: fixed;
             top: 0; left: 0;
             width: 100%; height: 100%;
             background: rgba(0,0,0,0.3);
-            display: none; /* Tersembunyi default */
+            display: none; 
             align-items: center;
             justify-content: center;
             z-index: 999;
         }
-        /* BENTUK KERTAS SURAT (POPUP) */
         .popup-letter {
-            position: relative;
-            background: var(--color-popup);
+            background: linear-gradient(135deg, #fff6f8, #ffdcef);
             border: 2px solid var(--color-border);
-            border-radius: 8px;
-            width: 90%;
-            max-width: 400px;
-            padding: 30px 20px 20px;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            width: 80%;
+            max-width: 350px;
+            padding: 25px 20px 20px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
             text-align: center;
-            font-family: 'Dancing Script', cursive;
-            max-height: 70vh; /* Jika teks panjang, akan scroll */
+            font-family: 'Allura', cursive;
+            font-size: 1.3em;
+            line-height: 1.6;
+            max-height: 70vh;
             overflow-y: auto;
+            position: relative;
+
+            transform: scale(0.8);
+            opacity: 0;
+            transition: all 0.3s ease;
         }
-        /* Flap segitiga di atas popup */
         .popup-letter::before {
             content: "";
             position: absolute;
@@ -302,12 +306,10 @@
             left: 50%;
             transform: translate(-50%, -100%);
             width: 0; height: 0;
-            border-left: 60px solid transparent;
-            border-right: 60px solid transparent;
-            border-bottom: 50px solid var(--color-popup);
+            border-left: 50px solid transparent;
+            border-right: 50px solid transparent;
+            border-bottom: 40px solid #ffdcef;
         }
-
-        /* Tombol close di dalam popup */
         .close-btn {
             display: inline-block;
             background: var(--color-env2);
@@ -327,8 +329,12 @@
             transform: translateY(-2px);
             box-shadow: 0 7px 20px rgba(0,0,0,0.2);
         }
+        .popup-wrapper.show .popup-letter {
+            transform: scale(1);
+            opacity: 1;
+        }
 
-        /* Falling petals animation */
+        /* Kelopak mawar jatuh */
         .petal-container {
             pointer-events: none;
             position: fixed;
@@ -385,51 +391,19 @@
         /* MEDIA QUERY UNTUK LAYAR KECIL */
         @media (max-width: 480px) {
             .title {
-                font-size: 2em; 
+                font-size: 2em;
             }
+            /* Perbesar margin-top di mobile juga */
             .envlope-wrapper {
                 height: auto; 
-                margin-top: 10px;
+                margin-top: 100px; /* Bisa 120px kalau masih menabrak */
             }
             #envelope {
-                top: 0px;
-                margin-top: 20px; 
-                width: 90vw;
-                max-width: 350px; 
-                height: auto; 
-            }
-
-            /* Pastikan border-left + border-right = 90vw (total lebar amplop) */
-            .flap,
-            .pocket {
-                border-left: 45vw solid transparent;  
-                border-right: 45vw solid transparent;
-            }
-            /* Flap atas ~34% dari lebar (pakai 34vw) */
-            .flap {
-                border-top: 34vw solid var(--color-flap);
-                border-bottom: 0;
-            }
-            /* Pocket bawah ~31% dari lebar (pakai 31vw) */
-            .pocket {
-                border-bottom: 31vw solid var(--color-env2);
-                border-top: 31vw solid transparent;
-            }
-
-            .letter {
-                top: 0%;
-                width: 90%;
-                height: auto;
-                margin-bottom: 20px;
-            }
-            .open .letter {
-                transform: translateY(-30px) rotate(-2deg);
-            }
-            .message p {
-                font-size: 1.4em; 
+                transform: scale(0.8); /* Kecilkan amplop */
+                transform-origin: top center;
             }
             .secret-btn {
-                margin-top: 20px;
+                margin-top: 40px;
             }
         }
     </style>
@@ -466,14 +440,28 @@
     <!-- TOMBOL SECRET MESSAGE -->
     <button class="secret-btn" id="secretBtn">Secret Message</button>
 
+    <!-- Kelopak mawar -->
+    <div class="petal-container">
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+        <div class="petal"></div>
+    </div>
+
     <!-- POPUP SECRET MESSAGE -->
     <div class="popup-wrapper" id="popupWrapper">
       <div class="popup-letter">
-        <h2>Secret Message</h2>
+        <h2 style="margin-top: 0;">Secret Message</h2>
         <p>Dear Elisabeth,</p>
         <p>
-            Thanks for adding color to my everyday life. 
-            Your presence makes every moment brighter.
+            Thanks for adding color to my everyday life.<br>
+            Your presence makes every moment brighter.<br>
             I’m grateful for our connection and hope our joy lasts forever!
         </p>
         <p>With love,</p>
@@ -487,20 +475,6 @@
     <audio id="loveAudio" preload="auto">
         <source src="https://cdn.pixabay.com/download/audio/2022/03/29/audio_423ef21a5e.mp3?filename=romantic-love-connection-116985.mp3" type="audio/mp3">
     </audio>
-
-    <!-- Elemen kelopak mawar yang jatuh -->
-    <div class="petal-container">
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-        <div class="petal"></div>
-    </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
@@ -538,14 +512,20 @@
                 }
             }
 
-            // Tombol Secret Message: tampilkan popup
+            // Tombol Secret Message: popup fade in + scale in
             secretBtn.on('click', function() {
                 popupWrapper.css('display', 'flex');
+                setTimeout(() => {
+                    popupWrapper.addClass('show');
+                }, 50);
             });
 
-            // Tombol "Close" di popup: sembunyikan popup
+            // Tombol "Close": tutup popup
             closeBtn.on('click', function() {
-                popupWrapper.css('display', 'none');
+                popupWrapper.removeClass('show');
+                setTimeout(() => {
+                    popupWrapper.css('display', 'none');
+                }, 300);
             });
         });
     </script>
